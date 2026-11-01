@@ -30,7 +30,7 @@ type OverviewPageProps = {
 
 export function OverviewPage({ accounts, activities, busy, categoryGradient, categoryTotals, chartData, handleDelete, household, month, monthlyExpenses, monthlyIncome, members, setActiveTab, setModal, setNotice, totalBalance, topCategory, transactions }: OverviewPageProps) {
   return (
-    <>
+    <div className='overview-page'>
               <section className='summary-grid'>
                 <article className='summary-card balance-card'>
                   <div className='card-title'>
@@ -272,7 +272,7 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                   busy={busy}
                 />
               </section>
-              <section className='panel transactions-panel'>
+              <section className='panel transactions-panel overview-activity-preview'>
                 <div className='panel-heading'>
                   <div>
                     <h2>Family activity</h2>
@@ -287,7 +287,7 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                 </div>
                 <ActivityList activities={activities.slice(0, 5)} />
               </section>
-              <section className='account-strip'>
+              <section className='account-strip overview-account-preview'>
                 <div className='strip-heading'>
                   <div>
                     <h2>Your accounts</h2>
@@ -308,6 +308,6 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                   <Icon name='plus' size={16} /> Add another account
                 </button>
               </section>
-    </>
+    </div>
   )
 }

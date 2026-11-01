@@ -295,6 +295,40 @@ function App() {
           </button>
         </div>
       </aside>
+      <nav className='mobile-nav' aria-label='Main navigation'>
+        <button
+          className={activeTab === 'overview' ? 'active' : ''}
+          aria-current={activeTab === 'overview' ? 'page' : undefined}
+          onClick={() => setActiveTab('overview')}
+        >
+          <Icon name='home' size={19} />
+          <span>Overview</span>
+        </button>
+        <button
+          className={activeTab === 'transactions' ? 'active' : ''}
+          aria-current={activeTab === 'transactions' ? 'page' : undefined}
+          onClick={() => setActiveTab('transactions')}
+        >
+          <Icon name='receipt' size={19} />
+          <span>Transactions</span>
+        </button>
+        <button
+          className={activeTab === 'accounts' ? 'active' : ''}
+          aria-current={activeTab === 'accounts' ? 'page' : undefined}
+          onClick={() => setActiveTab('accounts')}
+        >
+          <Icon name='wallet' size={19} />
+          <span>Accounts</span>
+        </button>
+        <button
+          className={activeTab === 'activity' ? 'active' : ''}
+          aria-current={activeTab === 'activity' ? 'page' : undefined}
+          onClick={() => setActiveTab('activity')}
+        >
+          <Icon name='activity' size={19} />
+          <span>Activity</span>
+        </button>
+      </nav>
       <main className='main-content'>
         <header className='topbar'>
           <div className='mobile-brand'>
