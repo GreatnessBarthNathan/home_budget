@@ -20,3 +20,36 @@
   .overview-page .category-row:nth-child(n+4),.overview-page .transaction-row:nth-child(n+4){display:none}
   .overview-page .family-members{display:none}
 }
+/* Account detail */
+.account-card{display:block;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.account-card:hover,.account-card:focus-visible{border-color:#b9c9b6;box-shadow:0 3px 12px #243a2010;outline:none}
+.account-detail-page{display:grid;gap:16px}
+.account-back{justify-self:start;margin:-10px 0 0}
+.account-detail-overview{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fff;border:1px solid #eeefe9;border-radius:11px;padding:22px}
+.account-detail-name{display:flex;align-items:center;gap:13px}
+.account-detail-name .account-symbol{width:42px;height:42px;border-radius:12px;display:grid;place-items:center}
+.account-detail-name h2{font-family:Manrope,sans-serif;font-size:21px;letter-spacing:-.6px;margin:5px 0 0}
+.account-detail-balance{display:grid;gap:6px;text-align:right}
+.account-detail-balance strong{font-family:Manrope,sans-serif;font-size:24px;letter-spacing:-.6px}
+.account-detail-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.account-detail-stats .summary-card{min-width:0}
+.account-detail-stats .summary-card>strong{font-size:20px}
+.account-detail-stats .summary-card>strong.positive{color:#63846b}
+.account-high-category{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-spending-panel,.account-transactions-panel{min-width:0}
+.account-category-highlight{font-size:10px;color:#63846b;background:#f0f4ee;padding:6px 9px;border-radius:99px;white-space:nowrap}
+.account-category-list{display:grid;gap:14px;margin-top:18px}
+.account-category-row{display:grid;grid-template-columns:10px minmax(88px,1fr) minmax(80px,2fr) auto;align-items:center;gap:10px;font-size:11px}
+.account-category-row>strong{font-size:11px;white-space:nowrap}
+.account-category-bar{height:6px;background:#f0f1ed;border-radius:99px;overflow:hidden}
+.account-category-bar>span{display:block;height:100%;background:#78927b;border-radius:inherit}
+.account-transactions-panel .transaction-list{margin-top:15px}
+@media(max-width:600px){.account-detail-overview{align-items:flex-start;padding:16px;flex-direction:column}.account-detail-balance{text-align:left}.account-detail-stats{grid-template-columns:1fr}.account-detail-stats .summary-card{padding:14px}.account-category-row{grid-template-columns:10px minmax(70px,1fr) minmax(48px,1fr) auto;gap:7px}.account-category-row>strong{font-size:10px}}
+.account-balance-list{display:grid;gap:6px;margin-top:12px}
+.account-balance-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;border:0;border-bottom:1px solid #f0f1ed;background:transparent;text-align:left;color:inherit}
+.account-balance-row:hover,.account-balance-row:focus-visible{background:#f8f9f6;outline:none}
+.account-balance-row>.account-symbol{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.account-balance-name{display:grid;gap:3px;flex:1;min-width:0}
+.account-balance-name strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-balance-name small{font-size:9px;color:#999c94}
+.account-balance-row>strong:last-child{font-family:Manrope,sans-serif;font-size:12px;white-space:nowrap}

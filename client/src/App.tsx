@@ -10,6 +10,7 @@ import { ActivityPage } from './pages/ActivityPage'
 import { AuthPage } from './pages/AuthPage'
 import { OverviewPage } from './pages/OverviewPage'
 import { TransactionsPage } from './pages/TransactionsPage'
+import { AccountDetailPage } from './pages/AccountDetailPage'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -23,6 +24,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<
     DashboardTab
   >('overview')
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null)
   const [modal, setModal] = useState<'transaction' | 'account' | null>(null)
   const [search, setSearch] = useState('')
   const [busy, setBusy] = useState(false)
@@ -77,16 +79,6 @@ function App() {
   const monthlyIncome = transactions
     .filter((item) => item.kind === 'income')
     .reduce((sum, item) => sum + item.amount, 0)
-  const totalBalance = accounts.reduce((sum, account) => {
-    const net = transactions
-      .filter((item) => item.account === account._id)
-      .reduce(
-        (total, item) =>
-          total + (item.kind === 'income' ? item.amount : -item.amount),
-        0,
-      )
-    return sum + (account.monthEndBalance ?? account.openingBalance + net)
-  }, 0)
   const categoryTotals = useMemo(
     () =>
       categories
@@ -102,44 +94,15 @@ function App() {
         .sort((a, b) => b.amount - a.amount),
     [transactions],
   )
-  const chartData = useMemo(() => {
-    const year = Number(month.slice(0, 4))
-    const monthIndex = Number(month.slice(5, 7)) - 1
-    const days = new Date(year, monthIndex + 1, 0).getDate()
-    let running = accounts.reduce((sum, account) => {
-      const monthNet = transactions
-        .filter((item) => item.account === account._id)
-        .reduce(
-          (total, item) =>
-            total + (item.kind === 'income' ? item.amount : -item.amount),
-          0,
-        )
-      return (
-        sum +
-        (account.monthEndBalance ?? account.openingBalance + monthNet) -
-        monthNet
-      )
-    }, 0)
-    const byDay = new Map<number, number>()
-    transactions.forEach((item) => {
-      const day = Number(item.date.slice(0, 10).slice(-2))
-      byDay.set(
-        day,
-        (byDay.get(day) ?? 0) +
-          (item.kind === 'income' ? item.amount : -item.amount),
-      )
-    })
-    return Array.from({ length: days }, (_, index) => {
-      running += byDay.get(index + 1) ?? 0
-      return { day: index + 1, balance: running }
-    })
-  }, [accounts, transactions, month])
   const filteredTransactions = transactions.filter((item) =>
     `${item.description} ${item.category} ${accounts.find((account) => account._id === item.account)?.name ?? ''}`
       .toLowerCase()
       .includes(search.toLowerCase()),
   )
   const topCategory = categoryTotals[0]
+  const selectedAccount = accounts.find(
+    (account) => account._id === selectedAccountId,
+  )
   const categoryPalette = [
     '#4c765f',
     '#d2a080',
@@ -266,7 +229,10 @@ function App() {
           </button>
           <button
             className={activeTab === 'accounts' ? 'active' : ''}
-            onClick={() => setActiveTab('accounts')}
+            onClick={() => {
+              setSelectedAccountId(null)
+              setActiveTab('accounts')
+            }}
           >
             <Icon name='wallet' /> Accounts
           </button>
@@ -315,7 +281,10 @@ function App() {
         <button
           className={activeTab === 'accounts' ? 'active' : ''}
           aria-current={activeTab === 'accounts' ? 'page' : undefined}
-          onClick={() => setActiveTab('accounts')}
+          onClick={() => {
+            setSelectedAccountId(null)
+            setActiveTab('accounts')
+          }}
         >
           <Icon name='wallet' size={19} />
           <span>Accounts</span>
@@ -346,7 +315,7 @@ function App() {
                 : activeTab === 'transactions'
                   ? 'Transactions'
                   : activeTab === 'accounts'
-                    ? 'Accounts'
+                    ? selectedAccount?.name ?? 'Accounts'
                     : 'Family activity'}
             </strong>
           </div>
@@ -400,7 +369,9 @@ function App() {
                   : activeTab === 'transactions'
                     ? 'Your transactions.'
                     : activeTab === 'accounts'
-                      ? 'Your accounts.'
+                      ? selectedAccount
+                        ? `${selectedAccount.name}.`
+                        : 'Your accounts.'
                       : 'Everyone’s contributions.'}
               </h1>
               <p>
@@ -409,7 +380,9 @@ function App() {
                   : activeTab === 'transactions'
                     ? 'Every little thing, all in one place.'
                     : activeTab === 'accounts'
-                      ? 'Keep an eye on where your money lives.'
+                      ? selectedAccount
+                        ? 'See what’s coming in, going out, and where you’re spending.'
+                        : 'Keep an eye on where your money lives.'
                       : 'See what your family has been up to.'}
               </p>
             </div>
@@ -427,19 +400,20 @@ function App() {
               busy={busy}
               categoryGradient={categoryGradient}
               categoryTotals={categoryTotals}
-              chartData={chartData}
               handleDelete={handleDelete}
               household={household}
-              month={month}
               monthlyExpenses={monthlyExpenses}
               monthlyIncome={monthlyIncome}
               members={members}
               setActiveTab={setActiveTab}
               setModal={setModal}
               setNotice={setNotice}
-              totalBalance={totalBalance}
               topCategory={topCategory}
               transactions={transactions}
+              onAccountClick={(account) => {
+                setSelectedAccountId(account._id)
+                setActiveTab('accounts')
+              }}
             />
           )}
           {activeTab === 'transactions' && (
@@ -455,13 +429,24 @@ function App() {
           )}
           {activeTab === 'activity' && <ActivityPage activities={activities} />}
           {activeTab === 'accounts' && (
-            <AccountsPage
-              accounts={accounts}
-              month={month}
-              setModal={setModal}
-              totalBalance={totalBalance}
-              transactions={transactions}
-            />
+            selectedAccount ? (
+              <AccountDetailPage
+                account={selectedAccount}
+                accounts={accounts}
+                transactions={transactions}
+                busy={busy}
+                onBack={() => setSelectedAccountId(null)}
+                onDelete={handleDelete}
+              />
+            ) : (
+              <AccountsPage
+                accounts={accounts}
+                month={month}
+                setModal={setModal}
+                transactions={transactions}
+                onAccountClick={(account) => setSelectedAccountId(account._id)}
+              />
+            )
           )}
           <footer className='page-footer'>
             <span>Taking care of the little things adds up.</span>

@@ -6,10 +6,12 @@ export function AccountCards({
   accounts,
   transactions,
   expanded = false,
+  onAccountClick,
 }: {
   accounts: Account[]
   transactions: Transaction[]
   expanded?: boolean
+  onAccountClick: (account: Account) => void
 }) {
   if (!accounts.length)
     return (
@@ -37,7 +39,20 @@ export function AccountCards({
             0,
           )
         return (
-          <article className='account-card' key={account._id}>
+          <article
+            className='account-card'
+            key={account._id}
+            role='button'
+            tabIndex={0}
+            onClick={() => onAccountClick(account)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onAccountClick(account)
+              }
+            }}
+            aria-label={`View ${account.name} account`}
+          >
             <div className='account-card-top'>
               <span
                 className='account-symbol'

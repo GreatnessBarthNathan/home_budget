@@ -1,27 +1,25 @@
 import type { Account, Transaction } from '../types'
 import { AccountCards } from '../components/AccountCards'
 import { Icon } from '../components/Icon'
-import { monthLabel, money } from '../components/formatters'
+import { monthLabel } from '../components/formatters'
 
 type AccountsPageProps = {
   accounts: Account[]
   month: string
   setModal: (modal: 'transaction' | 'account' | null) => void
-  totalBalance: number
   transactions: Transaction[]
+  onAccountClick: (account: Account) => void
 }
 
-export function AccountsPage({ accounts, month, setModal, totalBalance, transactions }: AccountsPageProps) {
+export function AccountsPage({ accounts, month, setModal, transactions, onAccountClick }: AccountsPageProps) {
   return (
             <section className='account-page'>
               <div className='account-overview'>
                 <div>
-                  <span className='eyebrow'>END-OF-MONTH BALANCES</span>
-                  <h2>{money(totalBalance)}</h2>
+                  <span className='eyebrow'>YOUR ACCOUNTS</span>
+                  <h2>{accounts.length} {accounts.length === 1 ? 'account' : 'accounts'}</h2>
                   <p>
-                    Across your {accounts.length}{' '}
-                    {accounts.length === 1 ? 'account' : 'accounts'} in{' '}
-                    {monthLabel(month)}
+                    Each balance is shown separately for {monthLabel(month)}.
                   </p>
                 </div>
                 <button
@@ -35,6 +33,7 @@ export function AccountsPage({ accounts, month, setModal, totalBalance, transact
                 accounts={accounts}
                 transactions={transactions}
                 expanded
+                onAccountClick={onAccountClick}
               />
               <div className='accounts-note'>
                 <span>✳</span>

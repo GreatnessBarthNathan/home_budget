@@ -4,8 +4,7 @@ import { ActivityList } from '../components/ActivityList'
 import { FamilyPanel } from '../components/FamilyPanel'
 import { Icon } from '../components/Icon'
 import { TransactionList } from '../components/TransactionList'
-import { monthLabel, money } from '../components/formatters'
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { money } from '../components/formatters'
 
 type OverviewPageProps = {
   accounts: Account[]
@@ -13,37 +12,32 @@ type OverviewPageProps = {
   busy: boolean
   categoryGradient: string
   categoryTotals: { category: string; amount: number }[]
-  chartData: { day: number; balance: number }[]
   handleDelete: (id: string) => void
   household: Household | null
-  month: string
   monthlyExpenses: number
   monthlyIncome: number
   members: HouseholdMember[]
   setActiveTab: (tab: 'overview' | 'transactions' | 'accounts' | 'activity') => void
   setModal: (modal: 'transaction' | 'account' | null) => void
   setNotice: (message: string) => void
-  totalBalance: number
   topCategory: { category: string; amount: number } | undefined
   transactions: Transaction[]
+  onAccountClick: (account: Account) => void
 }
 
-export function OverviewPage({ accounts, activities, busy, categoryGradient, categoryTotals, chartData, handleDelete, household, month, monthlyExpenses, monthlyIncome, members, setActiveTab, setModal, setNotice, totalBalance, topCategory, transactions }: OverviewPageProps) {
+export function OverviewPage({ accounts, activities, busy, categoryGradient, categoryTotals, handleDelete, household, monthlyExpenses, monthlyIncome, members, setActiveTab, setModal, setNotice, topCategory, transactions, onAccountClick }: OverviewPageProps) {
   return (
     <div className='overview-page'>
               <section className='summary-grid'>
                 <article className='summary-card balance-card'>
                   <div className='card-title'>
-                    Total balance{' '}
+                    Accounts{' '}
                     <span className='card-icon green'>
                       <Icon name='wallet' size={18} />
                     </span>
                   </div>
-                  <strong>{money(totalBalance)}</strong>
-                  <small>
-                    Across {accounts.length}{' '}
-                    {accounts.length === 1 ? 'account' : 'accounts'}
-                  </small>
+                  <strong>{accounts.length}</strong>
+                  <small>Each account has its own balance</small>
                   <div className='balance-accent'>
                     <span />
                     <span />
@@ -92,100 +86,58 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                 <article className='panel trend-panel'>
                   <div className='panel-heading'>
                     <div>
-                      <h2>Balance over time</h2>
-                      <p>A running look at your household balance</p>
+                      <h2>Balance by account</h2>
+                      <p>Each account is shown separately</p>
                     </div>
-                    <span className='chart-period'>{monthLabel(month)}</span>
                   </div>
-                  {chartData.length && transactions.length ? (
-                    <div className='chart-wrap'>
-                      <ResponsiveContainer width='100%' height='100%'>
-                        <AreaChart
-                          data={chartData}
-                          margin={{ top: 10, right: 12, left: -12, bottom: 0 }}
-                        >
-                          <defs>
-                            <linearGradient
-                              id='balanceFill'
-                              x1='0'
-                              y1='0'
-                              x2='0'
-                              y2='1'
+                  {accounts.length ? (
+                    <div className='account-balance-list'>
+                      {accounts.map((account) => {
+                        const activity = transactions.filter(
+                          (transaction) => transaction.account === account._id,
+                        )
+                        const net = activity.reduce(
+                          (sum, transaction) =>
+                            sum +
+                            (transaction.kind === 'income'
+                              ? transaction.amount
+                              : -transaction.amount),
+                          0,
+                        )
+                        return (
+                          <button
+                            className='account-balance-row'
+                            key={account._id}
+                            onClick={() => onAccountClick(account)}
+                          >
+                            <span
+                              className='account-symbol'
+                              style={{
+                                color: account.color,
+                                backgroundColor: `${account.color}19`,
+                              }}
                             >
-                              <stop
-                                offset='0%'
-                                stopColor='#63836d'
-                                stopOpacity={0.19}
-                              />
-                              <stop
-                                offset='95%'
-                                stopColor='#63836d'
-                                stopOpacity={0}
-                              />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid
-                            vertical={false}
-                            stroke='#eeeee9'
-                            strokeDasharray='3 5'
-                          />
-                          <XAxis
-                            dataKey='day'
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fill: '#999b92', fontSize: 11 }}
-                            tickFormatter={(day) => `${day}`}
-                            interval='preserveStartEnd'
-                          />
-                          <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fill: '#999b92', fontSize: 11 }}
-                            tickFormatter={(value: number) =>
-                              value === 0
-                                ? '₦0'
-                                : `₦${Math.round(value / 1000)}k`
-                            }
-                          />
-                          <Tooltip
-                            formatter={(value: number) => [
-                              money(value),
-                              'Balance',
-                            ]}
-                            labelFormatter={(day) =>
-                              `${monthLabel(month).split(' ')[0]} ${day}`
-                            }
-                            contentStyle={{
-                              border: '1px solid #eeeee9',
-                              borderRadius: 12,
-                              fontSize: 12,
-                            }}
-                          />
-                          <Area
-                            type='monotone'
-                            dataKey='balance'
-                            stroke='#64846d'
-                            strokeWidth={2.5}
-                            fill='url(#balanceFill)'
-                            activeDot={{
-                              r: 4,
-                              fill: '#64846d',
-                              stroke: '#fff',
-                              strokeWidth: 2,
-                            }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                              <Icon name='wallet' size={16} />
+                            </span>
+                            <span className='account-balance-name'>
+                              <strong>{account.name}</strong>
+                              <small>{account.type}</small>
+                            </span>
+                            <strong>
+                              {money(account.monthEndBalance ?? account.openingBalance + net)}
+                            </strong>
+                          </button>
+                        )
+                      })}
                     </div>
                   ) : (
                     <div className='empty-chart'>
                       <span className='empty-icon'>
-                        <Icon name='chart' size={22} />
+                        <Icon name='wallet' size={22} />
                       </span>
-                      <strong>Your balance will take shape here</strong>
+                      <strong>Your account balances will appear here</strong>
                       <span>
-                        Add an account and a few transactions to see your
-                        monthly trend.
+                        Add an account to see its balance.
                       </span>
                     </div>
                   )}
@@ -300,7 +252,11 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                     All accounts <span>→</span>
                   </button>
                 </div>
-                <AccountCards accounts={accounts} transactions={transactions} />
+                <AccountCards
+                  accounts={accounts}
+                  transactions={transactions}
+                  onAccountClick={onAccountClick}
+                />
                 <button
                   className='add-account-link'
                   onClick={() => setModal('account')}
