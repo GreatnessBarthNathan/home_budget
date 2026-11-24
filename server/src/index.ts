@@ -7,6 +7,7 @@ import accountRouter from "./routers/accountRouter";
 import transactionRouter from "./routers/transactionRouter";
 import householdRouter from "./routers/householdRouter";
 import activityRouter from "./routers/activityRouter";
+import categoryRouter from "./routers/categoryRouter";
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
@@ -20,6 +21,7 @@ app.use("/api/accounts", accountRouter);
 app.use("/api/transactions", transactionRouter);
 app.use("/api/household", householdRouter);
 app.use("/api/activity", activityRouter);
+app.use("/api/categories", categoryRouter);
 app.use("/api", (_req, res) => res.status(404).json({ message: "API route not found." }));
 
 if (process.env.NODE_ENV === "production") {

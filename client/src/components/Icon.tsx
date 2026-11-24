@@ -85,6 +85,17 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d='M12 7v5l3 2' />
       </>
     ),
+    tag: (
+      <>
+        <path d='M20 13 13 20 4 11V4h7z' />
+        <circle cx='8' cy='8' r='1' />
+      </>
+    ),
+    edit: (
+      <>
+        <path d='m14 5 5 5M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10z' />
+      </>
+    ),
   }
   return (
     <svg {...common} aria-hidden='true'>

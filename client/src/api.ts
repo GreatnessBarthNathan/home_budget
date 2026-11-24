@@ -1,4 +1,4 @@
-import type { Account, Activity, Household, HouseholdMember, Transaction, User } from "./types";
+import type { Account, Activity, Category, Household, HouseholdMember, Transaction, User } from "./types";
 
 const TOKEN_KEY = "home-budget-token";
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
@@ -37,6 +37,13 @@ export const api = {
   household: () => request<{ household: Household; members: HouseholdMember[] }>("/household"),
   activity: (month: string) => request<{ activities: Activity[] }>(`/activity?month=${encodeURIComponent(month)}`),
   accounts: (month: string) => request<{ accounts: Account[] }>(`/accounts?month=${encodeURIComponent(month)}`),
+  categories: () => request<{ categories: Category[] }>("/categories"),
+  addCategory: (name: string) =>
+    request<{ category: Category }>("/categories", { method: "POST", body: JSON.stringify({ name }) }),
+  updateCategory: (id: string, name: string) =>
+    request<{ category: Category }>(`/categories/${id}`, { method: "PATCH", body: JSON.stringify({ name }) }),
+  deleteCategory: (id: string) =>
+    request<{ message: string }>(`/categories/${id}`, { method: "DELETE" }),
   addAccount: (account: Pick<Account, "name" | "type" | "openingBalance" | "color">) =>
     request<{ account: Account }>("/accounts", { method: "POST", body: JSON.stringify(account) }),
   transactions: (month: string) =>
@@ -44,6 +51,11 @@ export const api = {
   addTransaction: (transaction: Omit<Transaction, "_id">) =>
     request<{ transaction: Transaction }>("/transactions", {
       method: "POST",
+      body: JSON.stringify(transaction)
+    }),
+  updateTransaction: (id: string, transaction: Omit<Transaction, "_id">) =>
+    request<{ transaction: Transaction }>(`/transactions/${id}`, {
+      method: "PATCH",
       body: JSON.stringify(transaction)
     }),
   deleteTransaction: (id: string) =>

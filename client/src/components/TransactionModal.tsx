@@ -1,31 +1,57 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Account, Transaction } from '../types'
 import { Icon } from './Icon'
-import { categories, localDateString } from './formatters'
+import { localDateString } from './formatters'
 
 export function TransactionModal({
   accounts,
+  categories,
   month,
+  transaction,
   onClose,
   onSave,
+  onUpdate,
 }: {
   accounts: Account[]
+  categories: string[]
   month: string
+  transaction?: Transaction
   onClose: () => void
   onSave: (value: Omit<Transaction, '_id'>) => Promise<void>
+  onUpdate: (id: string, value: Omit<Transaction, '_id'>) => Promise<void>
 }) {
-  const [kind, setKind] = useState<'expense' | 'income'>('expense')
-  const [description, setDescription] = useState('')
-  const [amount, setAmount] = useState('')
-  const [category, setCategory] = useState('Groceries')
-  const [account, setAccount] = useState(accounts[0]?._id ?? '')
+  const [kind, setKind] = useState<'expense' | 'income'>(transaction?.kind ?? 'expense')
+  const [description, setDescription] = useState(transaction?.description ?? '')
+  const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '')
+  const [category, setCategory] = useState(transaction?.category ?? 'Groceries')
+  const [account, setAccount] = useState(transaction?.account ?? accounts[0]?._id ?? '')
   const [date, setDate] = useState(() => {
+    if (transaction) return transaction.date.slice(0, 10)
     const today = localDateString(new Date())
     return today.slice(0, 7) === month ? today : `${month}-01`
   })
-  const [note, setNote] = useState('')
+  const [note, setNote] = useState(transaction?.note ?? '')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const unavailableCategory =
+    transaction && !categories.includes(transaction.category)
+      ? [transaction.category]
+      : []
+  const categoryOptions = transaction
+    ? transaction.kind === 'income'
+      ? [...unavailableCategory, ...categories, 'Income']
+      : [...unavailableCategory, ...categories]
+    : kind === 'income'
+      ? ['Income']
+      : categories
+  useEffect(() => {
+    if (categoryOptions.length && !categoryOptions.includes(category)) {
+      setCategory(categoryOptions[0])
+    }
+  }, [categoryOptions, category])
+  useEffect(() => {
+    if (!account && accounts.length) setAccount(accounts[0]._id)
+  }, [account, accounts])
   async function submit(event: React.FormEvent) {
     event.preventDefault()
     if (!account) {
@@ -35,15 +61,17 @@ export function TransactionModal({
     setSaving(true)
     setError('')
     try {
-      await onSave({
+      const payload = {
         kind,
         description,
         amount: Number(amount),
-        category: kind === 'income' ? 'Income' : category,
+        category: !transaction && kind === 'income' ? 'Income' : category,
         account,
         date,
         note,
-      })
+      }
+      if (transaction) await onUpdate(transaction._id, payload)
+      else await onSave(payload)
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -65,29 +93,31 @@ export function TransactionModal({
         <div className='modal-heading'>
           <div>
             <span className='eyebrow'>KEEPING TRACK</span>
-            <h2>Add a transaction</h2>
+            <h2>{transaction ? 'Edit transaction' : 'Add a transaction'}</h2>
           </div>
           <button className='modal-close' type='button' onClick={onClose}>
             <Icon name='close' />
           </button>
         </div>
         {error && <div className='error-box'>{error}</div>}
-        <div className='type-toggle'>
-          <button
-            type='button'
-            className={kind === 'expense' ? 'selected' : ''}
-            onClick={() => setKind('expense')}
-          >
-            Expense
-          </button>
-          <button
-            type='button'
-            className={kind === 'income' ? 'selected' : ''}
-            onClick={() => setKind('income')}
-          >
-            Income
-          </button>
-        </div>
+        {!transaction && (
+          <div className='type-toggle'>
+            <button
+              type='button'
+              className={kind === 'expense' ? 'selected' : ''}
+              onClick={() => setKind('expense')}
+            >
+              Expense
+            </button>
+            <button
+              type='button'
+              className={kind === 'income' ? 'selected' : ''}
+              onClick={() => setKind('income')}
+            >
+              Income
+            </button>
+          </div>
+        )}
         <label>
           Description
           <input
@@ -126,11 +156,11 @@ export function TransactionModal({
           <label>
             Category
             <select
-              value={kind === 'income' ? 'Income' : category}
-              disabled={kind === 'income'}
+              value={category}
+              disabled={!transaction && kind === 'income'}
               onChange={(event) => setCategory(event.target.value)}
             >
-              {(kind === 'income' ? ['Income'] : categories).map((value) => (
+              {categoryOptions.map((value) => (
                 <option key={value}>{value}</option>
               ))}
             </select>
@@ -171,7 +201,7 @@ export function TransactionModal({
             Cancel
           </button>
           <button className='button button-primary' disabled={saving}>
-            {saving ? 'Saving…' : 'Save transaction'}
+            {saving ? 'Saving…' : transaction ? 'Save changes' : 'Save transaction'}
           </button>
         </div>
       </form>

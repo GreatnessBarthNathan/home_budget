@@ -10,6 +10,7 @@ type AccountDetailPageProps = {
   busy: boolean
   onBack: () => void
   onDelete: (id: string) => void
+  onEdit: (transaction: Transaction) => void
 }
 
 export function AccountDetailPage({
@@ -19,6 +20,7 @@ export function AccountDetailPage({
   busy,
   onBack,
   onDelete,
+  onEdit,
 }: AccountDetailPageProps) {
   const accountTransactions = transactions.filter(
     (transaction) => transaction.account === account._id,
@@ -142,6 +144,7 @@ export function AccountDetailPage({
           transactions={accountTransactions}
           accounts={accounts}
           onDelete={onDelete}
+          onEdit={onEdit}
           busy={busy}
         />
       </section>

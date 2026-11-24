@@ -18,6 +18,13 @@ export type HouseholdMember = {
   email: string;
 };
 
+export type Category = {
+  _id: string;
+  name: string;
+  isDefault: boolean;
+  isIncome: boolean;
+};
+
 export type Transaction = {
   _id: string;
   description: string;
@@ -32,7 +39,7 @@ export type Transaction = {
 
 export type User = { id: string; email: string };
 
-export type DashboardTab = "overview" | "transactions" | "accounts" | "activity";
+export type DashboardTab = "overview" | "transactions" | "accounts" | "activity" | "categories";
 
 export type Activity = {
   _id: string;
