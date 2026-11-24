@@ -5,13 +5,11 @@ import { money } from './formatters'
 export function TransactionList({
   transactions,
   accounts,
-  onDelete,
   onEdit,
   busy,
 }: {
   transactions: Transaction[]
   accounts: Account[]
-  onDelete: (id: string) => void
   onEdit: (transaction: Transaction) => void
   busy: boolean
 }) {
@@ -73,14 +71,6 @@ export function TransactionList({
                 onClick={() => onEdit(item)}
               >
                 <Icon name='edit' size={15} />
-              </button>
-              <button
-                className='delete-transaction'
-                aria-label={`Delete ${item.description}`}
-                title='Delete transaction'
-                onClick={() => onDelete(item._id)}
-              >
-                ×
               </button>
             </span>
           </div>

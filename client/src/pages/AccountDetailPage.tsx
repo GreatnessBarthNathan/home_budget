@@ -9,7 +9,6 @@ type AccountDetailPageProps = {
   transactions: Transaction[]
   busy: boolean
   onBack: () => void
-  onDelete: (id: string) => void
   onEdit: (transaction: Transaction) => void
 }
 
@@ -19,7 +18,6 @@ export function AccountDetailPage({
   transactions,
   busy,
   onBack,
-  onDelete,
   onEdit,
 }: AccountDetailPageProps) {
   const accountTransactions = transactions.filter(
@@ -143,7 +141,6 @@ export function AccountDetailPage({
         <TransactionList
           transactions={accountTransactions}
           accounts={accounts}
-          onDelete={onDelete}
           onEdit={onEdit}
           busy={busy}
         />

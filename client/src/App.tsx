@@ -217,18 +217,6 @@ function App() {
     setNotice('Category deleted.')
     window.setTimeout(() => setNotice(''), 3000)
   }
-  async function handleDelete(id: string) {
-    try {
-      await api.deleteTransaction(id)
-      await refresh()
-    } catch (error) {
-      setNotice(
-        error instanceof Error
-          ? error.message
-          : 'Could not delete transaction.',
-      )
-    }
-  }
   function signOut() {
     saveToken(null)
     setUser(null)
@@ -483,7 +471,6 @@ function App() {
               busy={busy}
               categoryGradient={categoryGradient}
               categoryTotals={categoryTotals}
-              handleDelete={handleDelete}
               handleEdit={handleEditTransaction}
               household={household}
               monthlyExpenses={monthlyExpenses}
@@ -506,7 +493,6 @@ function App() {
               filteredTransactions={filteredTransactions}
               accounts={accounts}
               busy={busy}
-              handleDelete={handleDelete}
               handleEdit={handleEditTransaction}
               search={search}
               setSearch={setSearch}
@@ -521,7 +507,6 @@ function App() {
                 transactions={transactions}
                 busy={busy}
                 onBack={() => setSelectedAccountId(null)}
-                onDelete={handleDelete}
                 onEdit={handleEditTransaction}
               />
             ) : (

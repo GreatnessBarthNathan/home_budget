@@ -105,16 +105,3 @@ export async function updateTransaction(req: AuthRequest, res: Response) {
 
   return res.json({ transaction });
 }
-
-export async function deleteTransaction(req: AuthRequest, res: Response) {
-  if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: "Invalid transaction." });
-  const transaction = await Transaction.findOneAndDelete({ _id: req.params.id, household: req.householdId });
-  if (!transaction) return res.status(404).json({ message: "Transaction not found." });
-  await recordActivity(
-    new mongoose.Types.ObjectId(req.householdId),
-    new mongoose.Types.ObjectId(req.userId),
-    "transaction_deleted",
-    `Deleted ${transaction.kind}: ${transaction.description}`
-  );
-  return res.json({ message: "Transaction deleted." });
-}

@@ -12,7 +12,6 @@ type OverviewPageProps = {
   busy: boolean
   categoryGradient: string
   categoryTotals: { category: string; amount: number }[]
-  handleDelete: (id: string) => void
   handleEdit: (transaction: Transaction) => void
   household: Household | null
   monthlyExpenses: number
@@ -26,7 +25,7 @@ type OverviewPageProps = {
   onAccountClick: (account: Account) => void
 }
 
-export function OverviewPage({ accounts, activities, busy, categoryGradient, categoryTotals, handleDelete, handleEdit, household, monthlyExpenses, monthlyIncome, members, setActiveTab, setModal, setNotice, topCategory, transactions, onAccountClick }: OverviewPageProps) {
+export function OverviewPage({ accounts, activities, busy, categoryGradient, categoryTotals, handleEdit, household, monthlyExpenses, monthlyIncome, members, setActiveTab, setModal, setNotice, topCategory, transactions, onAccountClick }: OverviewPageProps) {
   return (
     <div className='overview-page'>
               <section className='summary-grid'>
@@ -221,7 +220,6 @@ export function OverviewPage({ accounts, activities, busy, categoryGradient, cat
                 <TransactionList
                   transactions={transactions.slice(0, 5)}
                   accounts={accounts}
-                  onDelete={handleDelete}
                   onEdit={handleEdit}
                   busy={busy}
                 />

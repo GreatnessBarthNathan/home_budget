@@ -7,13 +7,12 @@ type TransactionsPageProps = {
   filteredTransactions: Transaction[]
   accounts: Account[]
   busy: boolean
-  handleDelete: (id: string) => void
   handleEdit: (transaction: Transaction) => void
   search: string
   setSearch: (value: string) => void
 }
 
-export function TransactionsPage({ transactions, filteredTransactions, accounts, busy, handleDelete, handleEdit, search, setSearch }: TransactionsPageProps) {
+export function TransactionsPage({ transactions, filteredTransactions, accounts, busy, handleEdit, search, setSearch }: TransactionsPageProps) {
   return (
             <section className='panel full-panel'>
               <div className='panel-heading'>
@@ -33,7 +32,6 @@ export function TransactionsPage({ transactions, filteredTransactions, accounts,
               <TransactionList
                 transactions={filteredTransactions}
                 accounts={accounts}
-                onDelete={handleDelete}
                 onEdit={handleEdit}
                 busy={busy}
               />

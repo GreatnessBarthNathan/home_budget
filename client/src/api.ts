@@ -58,6 +58,4 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify(transaction)
     }),
-  deleteTransaction: (id: string) =>
-    request<{ message: string }>(`/transactions/${id}`, { method: "DELETE" })
 };
